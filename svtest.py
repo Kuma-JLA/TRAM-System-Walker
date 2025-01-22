@@ -5,7 +5,8 @@ import re
 import csv
 from datetime import datetime
 
-iqcapture_path = r"C:/Users/AWCC/Downloads/RSA_API-master/RSA_API-master/Utilities/RSA_API Apps V3.11/Apps/x64/IQcapture.exe"
+original_iqcapture_path = r"C:/.../IQcapture.exe"
+iqcapture_path = r"C:/.../IQcapture_TRAMs.exe"
 
 # シリアル番号とデバイスIDを取得・記録するための配列
 device_serial_mapping = {
@@ -35,7 +36,7 @@ output_directory = os.getcwd()  # 実行フォルダ
 
 def get_device_mapping():
     try:
-        result = subprocess.run([iqcapture_path], capture_output=True, text=True, shell=True)
+        result = subprocess.run([original_iqcapture_path], capture_output=True, text=True, shell=True)
         output = result.stdout
         pattern = r"Dev:(\d+)\s+ID:(\d+)\s+S/N:\"(\w+)\""
         matches = re.findall(pattern, output)
@@ -117,11 +118,11 @@ def write_to_csv(execution_time):
              [f"size_B021110_{i+1}" for i in range(10)]
     file_exists = False
 
-    try:
-        with open(csv_file_path, mode="r", newline="", encoding="utf-8") as f:
+    if not os.path.exists(csv_file_path):
+        # ファイルが存在しない場合、新規作成
+        with open(csv_file_path, mode="w", newline="", encoding="utf-8") as f:
             file_exists = True
-    except FileNotFoundError:
-        pass
+
 
     with open(csv_file_path, mode="a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=header)
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     else:
         print(f"cmpl: init")
         print(f"strt: meas")
-        for i in range(3):
+        for i in range(1):
             print(f"    meas: {i+1}")
             run_tasks()
         print(f"cmpl: meas")
